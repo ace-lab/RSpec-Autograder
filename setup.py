@@ -2,6 +2,7 @@
 import os
 from re import match as re_match
 from typing import Dict, List
+from test import Test
 
 SUITES_DIR: str = 'suites'
 SUITE_REGEX: str = '^suite[0-9]+$'
@@ -20,6 +21,7 @@ def getSuites(dir: str = SUITES_DIR) -> List[str]:
     return suites
 
 def loadFiles(suite: str, workspace: str) -> None:
+    # nuke workdir
     os.system(f"cp {SUITES_DIR}/common/* {WORK_DIR}/")
     os.system(f"cp {SUITES_DIR}/{suite}/* {WORK_DIR}/")
     # TODO: define where the grader script will be and copy it in
@@ -35,6 +37,8 @@ if __name__ == '__main__':
     for suite in getSuites("suites"):
         loadFiles(suite=suite, workspace=WORK_DIR)
         output = os.popen(f"ruby {WORK_DIR}/{GRADING_SCRIPT}").readlines()
+        clean_out = parse(output)
+        
 
 
 # write_to("/grade/results/results.json", json.dumps(gradingData))
