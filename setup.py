@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 import os
 from re import match as re_match
-from typing import List
+from typing import Dict, List
 
 SUITES_DIR: str = 'suites'
 SUITE_REGEX: str = '^suite[0-9]+$'
@@ -23,15 +24,17 @@ def loadFiles(suite: str, workspace: str) -> None:
     os.system(f"cp {SUITES_DIR}/{suite}/* {WORK_DIR}/")
     # TODO: define where the grader script will be and copy it in
 
+def parseOutput(output: str) -> Dict:
+    return {}
+
 if __name__ == '__main__':
 
     if not os.path.exists(WORK_DIR):
         os.mkdir(WORK_DIR)
     
-    
-
     for suite in getSuites("suites"):
         loadFiles(suite=suite, workspace=WORK_DIR)
-        output = os.system(f"ruby {WORK_DIR}/{GRADING_SCRIPT}")
+        output = os.popen(f"ruby {WORK_DIR}/{GRADING_SCRIPT}").readlines()
+
 
 # write_to("/grade/results/results.json", json.dumps(gradingData))
