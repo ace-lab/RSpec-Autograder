@@ -33,7 +33,8 @@ class Suite(object):
                 score += 1
 
         return {
-            'test_count' : len(self.tests),
-            'score' : score,
+            'name' : f"Suite {self.id}",
+            'points' : score,
+            'max_points' : len(self.tests),
             'fails' : fails 
         }
