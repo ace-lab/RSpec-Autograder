@@ -2,7 +2,7 @@
 import os
 from re import match as re_match
 from typing import Dict, List
-from test import Test
+from suite import Suite
 
 SUITES_DIR: str = 'suites'
 SUITE_REGEX: str = '^suite[0-9]+$'
@@ -20,14 +20,14 @@ def getSuites(dir: str = SUITES_DIR) -> List[str]:
     )
     return suites
 
-def loadFiles(suite: str, workspace: str) -> None:
-    # nuke workdir
+def prepareFiles(suite_name: str, workspace: str) -> None:
+    os.system(f"rm {WORK_DIR}/*")
     os.system(f"cp {SUITES_DIR}/common/* {WORK_DIR}/")
-    os.system(f"cp {SUITES_DIR}/{suite}/* {WORK_DIR}/")
+    os.system(f"cp {SUITES_DIR}/{suite_name}/* {WORK_DIR}/")
     # TODO: define where the grader script will be and copy it in
 
-def parseOutput(output: str) -> Dict:
-    return {}
+def parseOutput(output: str) -> Suite:
+    return None
 
 if __name__ == '__main__':
 
@@ -35,9 +35,9 @@ if __name__ == '__main__':
         os.mkdir(WORK_DIR)
     
     for suite in getSuites("suites"):
-        loadFiles(suite=suite, workspace=WORK_DIR)
+        prepareFiles(suite=suite, workspace=WORK_DIR)
         output = os.popen(f"ruby {WORK_DIR}/{GRADING_SCRIPT}").readlines()
-        clean_out = parse(output)
+        clean_out = parseOutput(output)
         
 
 
