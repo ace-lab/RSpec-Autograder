@@ -1,4 +1,4 @@
 
 def is_even(number):
-    number % 2 == 20
+    number / 2 == 0
 end
