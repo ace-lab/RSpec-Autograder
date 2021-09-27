@@ -2,9 +2,10 @@ from setup import prepareFiles
 from typing import Dict, List
 
 class Failure(object):
-    def __init__(self, err_msg: str, line_of_error: str) -> None:
+    def __init__(self, exception: str, err_msg: str, backtrace: List[str]) -> None:
+        self.exception = exception
         self.err_msg = err_msg
-        self.line_of_error = line_of_error
+        self.backtrace = backtrace
 
     def asdict(self) -> Dict[str, str]:
         return {
@@ -18,9 +19,9 @@ class Failure(object):
         return same_line # and same_stack # maybe include stack ?
 
 class Test(object):
-    def __init__(self, id: str, name: str, fail: Failure) -> None:
+    def __init__(self, id: str, desc: str, fail: Failure) -> None:
         self.id = id
-        self.name = name
+        self.description = desc
         self.passed = fail is None
         self.failure = fail
 
@@ -47,6 +48,7 @@ class Suite(object):
             if ref.failure != sub.failure:
                 fails.append({
                     'id' : testID,
+                    'desc' : sub.description,
                     'reference' : ref.failure.asdict(),
                     'submission' : sub.failure.asdict()
                 })

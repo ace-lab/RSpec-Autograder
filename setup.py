@@ -14,9 +14,10 @@ SUBMISSION_DIR: str = 'submission'
 SUITE_REGEX: str = '^suite[0-9]+$' 
 # this will be made when this script is run
 WORK_DIR: str = 'working'
-# TODO: define a good GRADING_SCRIPT in Dockerfile
-GRADING_SCRIPT: str = f"{os.getenv('GRADING_SCRIPT')} {WORK_DIR}/entry.rb"
-# assert GRADING_SCRIPT != '', 'You still need to define this'
+
+# this can be defined properly in `parse.py`
+GRADING_SCRIPT: str = f"{os.getenv('_GRADING_SCRIPT')} {WORK_DIR}/{os.getenv('_ENTRY_FILE')}"
+
 
 def lsSuites(dir: str = SUITES_DIR):
     """get the folder names that match SUITE_REGEX"""
