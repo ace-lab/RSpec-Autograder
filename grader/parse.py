@@ -1,7 +1,8 @@
 from typing import List
 from suite import Suite, Test, Failure
-# from os import environ
 from json import loads as json_loads
+
+import pdb
 
 GRADING_SCRIPT = 'bundle install > /dev/null && bundle exec rspec --format json'
 ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specific file
@@ -11,6 +12,7 @@ ID_LEN = 4 # this is the length of each test id (e.g. 4 for '[12]', 3 for '124')
 
 def parseOutput(output: str, name: str) -> Suite:
     """Function to parse the output of the GRADING_SCRIPT into a <Suite> instance"""
+    pdb.set_trace()
     out = json_loads(output)
     
     parsed_tests: List[Test] = []

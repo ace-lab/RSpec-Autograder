@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import pdb
 import os
 from sys import argv
 from re import match as re_match
@@ -38,7 +37,6 @@ def lsSuites(dir: str = SUITES_DIR):
 
 def load_suite(suite_name: str, solution: bool) -> Suite:
     """Empties the working directory, copies in the necessary files from common/, the suite, and the submission"""
-    # pdb.set_trace()
     # nuke working directory
     os.system(f"rm -rf {WORK_DIR}/*")
     # copy common files
@@ -62,7 +60,6 @@ def load_suite(suite_name: str, solution: bool) -> Suite:
 def runSuite(suite_name: str, solution: bool) -> Suite:
     """Prepares, runs, and parses the execution of a suite from its name (its folder)"""
     load_suite(suite_name=suite_name, solution=solution)
-    # pdb.set_trace()
     output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").readlines()
     return parseOutput(output=output, name=suite_name)
 
