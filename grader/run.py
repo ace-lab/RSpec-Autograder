@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import pdb
 import os
 from sys import argv
 from re import match as re_match
@@ -25,24 +26,25 @@ assert os.path.exists(f"{ROOT_DIR}"), f"ERROR: {ROOT_DIR} not found! Mounting ma
 
 with open(f"{SUITES_DIR}/meta.json", 'r') as info:
     grading_info = json_loads(info.read())
-with open("/grade/data/data.json", 'r') as data:
+with open(f"{ROOT_DIR}/data/data.json", 'r') as data:
     submission_data = json_loads(data.read())   
 
 def lsSuites(dir: str = SUITES_DIR):
     """get the folder names that match SUITE_REGEX"""
     yield from filter(
-        lambda name: re_match(SUITE_REGEX),
-        os.listdir(dir)
+        lambda name: re_match(SUITE_REGEX, name),
+        os.listdir(SUITES_DIR)
     )
 
 def load_suite(suite_name: str, solution: bool) -> Suite:
     """Empties the working directory, copies in the necessary files from common/, the suite, and the submission"""
+    # pdb.set_trace()
     # nuke working directory
-    os.system(f"rm {WORK_DIR}/*") 
+    os.system(f"rm -rf {WORK_DIR}/*")
     # copy common files
-    os.system(f"cp {SUITES_DIR}/common/* {WORK_DIR}/")
+    os.system(f"cp -r {SUITES_DIR}/common/* {WORK_DIR}")
     # copy in files from the suite
-    os.system(f"cp {SUITES_DIR}/{suite_name}/* {WORK_DIR}/")
+    os.system(f"cp -r {SUITES_DIR}/{suite_name}/* {WORK_DIR}")
 
     # copy the submitted files
     if solution:
@@ -60,7 +62,8 @@ def load_suite(suite_name: str, solution: bool) -> Suite:
 def runSuite(suite_name: str, solution: bool) -> Suite:
     """Prepares, runs, and parses the execution of a suite from its name (its folder)"""
     load_suite(suite_name=suite_name, solution=solution)
-    output = os.popen(GRADING_SCRIPT).readlines()
+    # pdb.set_trace()
+    output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").readlines()
     return parseOutput(output=output, name=suite_name)
 
 if __name__ == '__main__':
@@ -79,10 +82,11 @@ if __name__ == '__main__':
     #       and escalate
     if not os.path.exists(SUBMISSION_DIR):
         os.mkdir(SUBMISSION_DIR)
-    os.system(f"cp /grade/student/* {SUBMISSION_DIR}/")
+    # there may not be files in student/, so we just hide the error
+    os.system(f"cp {ROOT_DIR}/student/* {SUBMISSION_DIR} 2> /dev/null")
     
     # copy student submission from /grade/data/data.json 
-    #   into the end of f"{SUITES_DIR}/submission/_submission_file"
+    #   into the end of f"{SUBMISSION_DIR}/_submission_file"
     with open(f"{SUBMISSION_DIR}/_submission_file", 'a') as sub:
         sub.write(
             submission_data['submission']['submitted_answer']['student-parsons-solution']
@@ -96,6 +100,7 @@ if __name__ == '__main__':
         gradingData['tests'].append(score_report)
 
 
-    with open('/grade/results/results.json', 'w') as results:
+    print("HEY WE GOT HERE")
+    with open('{ROOT_DIR}/results/results.json', 'w') as results:
         json_data: str = json_dumps(gradingData)
         results.write(json_data)

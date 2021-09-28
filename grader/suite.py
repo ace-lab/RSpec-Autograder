@@ -1,4 +1,3 @@
-from setup import prepareFiles
 from typing import Dict, List
 
 class Failure(object):

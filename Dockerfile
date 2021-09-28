@@ -10,6 +10,6 @@ RUN chmod +x /grader/run.py
 # maybe install py3-pip
 
 RUN apk add --no-cache ruby
-# RUN gem install bundler
-RUN gem install rspec
+RUN gem install bundler
+# RUN gem install rspec
 

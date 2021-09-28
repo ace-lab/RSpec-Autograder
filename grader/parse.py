@@ -1,10 +1,9 @@
-from grader.run import GRADING_SCRIPT
 from typing import List
 from suite import Suite, Test, Failure
 # from os import environ
 from json import loads as json_loads
 
-GRADING_SCRIPT = 'bundle exec rspec --format json'
+GRADING_SCRIPT = 'bundle install > /dev/null && bundle exec rspec --format json'
 ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specific file
 # alternative to this len is to have a delimeter that splits 
 #   the test name into a test description and an ID
