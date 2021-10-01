@@ -2,7 +2,7 @@
 
 ### TODO:
 - (requirement) interface with existing parson's problem generation
-- (improvement) create an ergonomic way to make questions for this behemoth
+- (improvement) create an ergonomic way to make questions for this 
 
 To use, add the following to  `info.json`  in your question 
 ```json
