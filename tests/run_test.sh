@@ -44,14 +44,25 @@ chmod +x .testing/grader/run.py
 # and run it
 echo ==================== RUNNING THE GRADER ====================
 echo
-# .testing/grader/run.py `pwd`/.testing
-sudo docker build .
+# only report errors
+im="$(sudo docker build -q . | cut -d: -f2)"
+echo image: $im
+cont="$(sudo docker run -d $im /grade/grader/run.py)"
+echo container: $cont
+echo container exited with code "$(sudo docker container wait $cont)"
+sudo docker cp $cont:grade/results/results.json ./.testing/results/results.json
+sudo docker container rm $cont > /dev/null
 echo 
 echo ========================= FINISHED =========================
 
 
 # compare the result
-diff .testing/results/results.json $suite_dir/expected.json | less
+echo ========================= DIFF RESULTS =========================
+echo
+diff .testing/results/results.json $suite_dir/expected.json
+echo
+echo =========================== END DIFF ===========================
+
 
 # and clean up
-# rm -rf .testing
+rm -rf .testing

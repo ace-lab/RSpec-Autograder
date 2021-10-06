@@ -160,7 +160,7 @@
         "override_score": null,
         "partial_scores": {},
         "submitted_answer": {
-            "student-parsons-solution": "it 'should return  on ' do\r\n  end\r\nend\r\n",
+            "student-parsons-solution": "describe 'even?' do\r\n  it 'should return true on even number [00]' do\r\n    (2..10).step(2).each do |n|\r\n      expect(even?(n)).to eq true\r\n    end\r\n  end\r\nend\r\n",
             "parsons-solutioncodeline0-0": "",
             "parsons-solutioncodeline1-0": "",
             "parsons-solutioncodeline1-1": "",

@@ -14,12 +14,12 @@ SUITES_DIR: str = f"{ROOT_DIR}/serverFilesCourse/suites"
 SOLUTION_DIR: str = f"{SUITES_DIR}/solution"
 SUBMISSION_DIR: str = f"{SUITES_DIR}/submission"
 
-SUITE_REGEX: str = '^suite[0-9]+$' 
+SUITE_REGEX: str = '^suite[0-9]+$'
 # this will be made when this script is run
 WORK_DIR: str = f"{ROOT_DIR}/working"
 
 # this can be defined properly in `parse.py`
-GRADING_SCRIPT: str = f"{GRADING_SCRIPT} {WORK_DIR}/{ENTRY_FILE}"
+GRADING_SCRIPT: str = GRADING_SCRIPT.format(work=WORK_DIR, file=f"{WORK_DIR}/{ENTRY_FILE}")
 
 assert os.path.exists(f"{ROOT_DIR}"), f"ERROR: {ROOT_DIR} not found! Mounting may have failed."
 
@@ -60,7 +60,7 @@ def load_suite(suite_name: str, solution: bool) -> Suite:
 def runSuite(suite_name: str, solution: bool) -> Suite:
     """Prepares, runs, and parses the execution of a suite from its name (its folder)"""
     load_suite(suite_name=suite_name, solution=solution)
-    output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").readlines()
+    output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
     return parseOutput(output=output, name=suite_name)
 
 if __name__ == '__main__':
@@ -97,7 +97,6 @@ if __name__ == '__main__':
         gradingData['tests'].append(score_report)
 
 
-    print("HEY WE GOT HERE")
-    with open('{ROOT_DIR}/results/results.json', 'w') as results:
+    with open(f'{ROOT_DIR}/results/results.json', 'w') as results:
         json_data: str = json_dumps(gradingData)
         results.write(json_data)

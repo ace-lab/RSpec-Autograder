@@ -13,9 +13,9 @@ class Failure(object):
         }
 
     def __eq__(self, o) -> bool:
-        same_line = self.line_of_error == o.line_of_error
-
-        return same_line # and same_stack # maybe include stack ?
+        same_ex = self.exception == o.exception
+        
+        return same_ex # and same_stack # maybe include stack ?
 
 class Test(object):
     def __init__(self, id: str, desc: str, fail: Failure) -> None:
@@ -37,9 +37,11 @@ class Suite(object):
         fails: List[Dict[str, str]] = []
         score: int = 0
 
+        # assert False, f"ref: {reference.tests} \n\n\nsub: {submission.tests}"
+
         for testID in reference.tests.keys():
-            ref: Test = reference.get(testID)
-            sub: Test = submission.get(testID)
+            ref: Test = reference.tests.get(testID)
+            sub: Test = submission.tests.get(testID)
 
             if sub is None:
                 raise ValueError(f"Submission does not contain graded test [{testID}]")

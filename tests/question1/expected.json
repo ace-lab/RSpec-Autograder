@@ -1,3 +1,1 @@
-{
-    "TODO" : "fill this in"
-}
+{"gradable": true, "tests": [{"name": "Suite suite2", "points": 1, "max_points": 1, "fails": []}, {"name": "Suite suite1", "points": 1, "max_points": 1, "fails": []}]}
