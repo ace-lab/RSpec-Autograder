@@ -47,7 +47,7 @@ echo
 # only report errors
 im="$(sudo docker build -q . | cut -d: -f2)"
 echo image: $im
-cont="$(sudo docker run -d $im /grade/grader/run.py)"
+cont="$(sudo docker run -d $im /grader/run.py)"
 echo container: $cont
 echo container exited with code "$(sudo docker container wait $cont)"
 sudo docker cp $cont:grade/results/results.json ./.testing/results/results.json

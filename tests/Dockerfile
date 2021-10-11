@@ -10,14 +10,14 @@ RUN mkdir /grade/serverFilesCourse
 RUN mkdir /grade/serverFilesCourse/suites
 RUN mkdir /grade/student
 RUN mkdir /grade/tests
-RUN mkdir /grade/grader
+RUN mkdir /grader
 
 COPY .testing/data/ /grade/data
 COPY .testing/results/ /grade/results
 COPY .testing/serverFilesCourse/ /grade/serverFilesCourse
 COPY .testing/student/ /grade/student
 COPY .testing/tests /grade/tests
-COPY .testing/grader/ /grade/grader
+COPY .testing/grader/ /grader
 
 RUN apk update 
 RUN apk upgrade
