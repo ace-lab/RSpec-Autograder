@@ -1,45 +1,48 @@
 #!/usr/bin/python3
 import os
+from sys import argv
 from re import match as re_match
 from json import dumps as json_dumps
 from json import loads as json_loads
-from typing import Dict, List
+from typing import Dict
 from suite import Suite
-from parse import parseOutput
+from parse import parseOutput, GRADING_SCRIPT, ENTRY_FILE
 
-SUITES_DIR: str = 'suites'
-# the following should be in the SUITES_DIR
+ROOT_DIR: str = '/grade' if len(argv) < 2 else argv[1]
+
+SUITES_DIR: str = f"{ROOT_DIR}/serverFilesCourse/suites"
 SOLUTION_DIR: str = f"{SUITES_DIR}/solution"
 SUBMISSION_DIR: str = f"{SUITES_DIR}/submission"
-SUITE_REGEX: str = '^suite[0-9]+$' 
+
+SUITE_REGEX: str = '^suite[0-9]+$'
 # this will be made when this script is run
-WORK_DIR: str = 'working'
+WORK_DIR: str = f"{ROOT_DIR}/working"
 
 # this can be defined properly in `parse.py`
-GRADING_SCRIPT: str = f"{os.getenv('_GRADING_SCRIPT')} {WORK_DIR}/{os.getenv('_ENTRY_FILE')}"
+GRADING_SCRIPT: str = GRADING_SCRIPT.format(work=WORK_DIR, file=f"{WORK_DIR}/{ENTRY_FILE}")
 
-assert os.path.exists('/grade'), "ERROR: /grade not found! Mounting may have failed."
+assert os.path.exists(f"{ROOT_DIR}"), f"ERROR: {ROOT_DIR} not found! Mounting may have failed."
 
 with open(f"{SUITES_DIR}/meta.json", 'r') as info:
     grading_info = json_loads(info.read())
-with open("/grade/data/data.json", 'r') as data:
+with open(f"{ROOT_DIR}/data/data.json", 'r') as data:
     submission_data = json_loads(data.read())   
 
 def lsSuites(dir: str = SUITES_DIR):
     """get the folder names that match SUITE_REGEX"""
     yield from filter(
-        lambda name: re_match(SUITE_REGEX),
-        os.listdir(dir)
+        lambda name: re_match(SUITE_REGEX, name),
+        os.listdir(SUITES_DIR)
     )
 
 def load_suite(suite_name: str, solution: bool) -> Suite:
     """Empties the working directory, copies in the necessary files from common/, the suite, and the submission"""
     # nuke working directory
-    os.system(f"rm {WORK_DIR}/*") 
+    os.system(f"rm -rf {WORK_DIR}/*")
     # copy common files
-    os.system(f"cp {SUITES_DIR}/common/* {WORK_DIR}/")
+    os.system(f"cp -r {SUITES_DIR}/common/* {WORK_DIR}")
     # copy in files from the suite
-    os.system(f"cp {SUITES_DIR}/{suite_name}/* {WORK_DIR}/")
+    os.system(f"cp -r {SUITES_DIR}/{suite_name}/* {WORK_DIR}")
 
     # copy the submitted files
     if solution:
@@ -57,7 +60,7 @@ def load_suite(suite_name: str, solution: bool) -> Suite:
 def runSuite(suite_name: str, solution: bool) -> Suite:
     """Prepares, runs, and parses the execution of a suite from its name (its folder)"""
     load_suite(suite_name=suite_name, solution=solution)
-    output = os.popen(GRADING_SCRIPT).readlines()
+    output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
     return parseOutput(output=output, name=suite_name)
 
 if __name__ == '__main__':
@@ -71,8 +74,16 @@ if __name__ == '__main__':
     if not os.path.exists(WORK_DIR):
         os.mkdir(WORK_DIR)
 
+    # TODO: consider the security hole here, the student now has code that 
+    #       can be run arbitrarily, so they might be able to get our code 
+    #       and escalate
+    if not os.path.exists(SUBMISSION_DIR):
+        os.mkdir(SUBMISSION_DIR)
+    # there may not be files in student/, so we just hide the error
+    os.system(f"cp {ROOT_DIR}/student/* {SUBMISSION_DIR} 2> /dev/null")
+    
     # copy student submission from /grade/data/data.json 
-    #   into the end of f"{SUITES_DIR}/submission/_submission_file"
+    #   into the end of f"{SUBMISSION_DIR}/_submission_file"
     with open(f"{SUBMISSION_DIR}/_submission_file", 'a') as sub:
         sub.write(
             submission_data['submission']['submitted_answer']['student-parsons-solution']
@@ -86,6 +97,6 @@ if __name__ == '__main__':
         gradingData['tests'].append(score_report)
 
 
-    with open('/grade/results/results.json', 'w') as results:
+    with open(f'{ROOT_DIR}/results/results.json', 'w') as results:
         json_data: str = json_dumps(gradingData)
         results.write(json_data)
