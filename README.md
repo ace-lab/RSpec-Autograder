@@ -6,7 +6,7 @@
 
 To use, add the following to  `info.json`  in your question 
 ```json
-"exernalGradingOptions": {
+"externalGradingOptions": {
         "enabled": true,
         "image" : TO BE DETERMINED,
         "serverFilesCourse": ["suites/"],
