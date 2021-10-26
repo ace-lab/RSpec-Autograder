@@ -3,6 +3,8 @@
 ### TODO:
 - (requirement) interface with existing parson's problem generation
 - (improvement) create an ergonomic way to make questions for this 
+- propogate command error to prarielearn output
+  - confirm this is done
 
 To use, add the following to  `info.json`  in your question 
 ```json
