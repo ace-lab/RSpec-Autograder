@@ -10,7 +10,7 @@ To use, add the following to  `info.json`  in your question
         "enabled": true,
         "image" : TO BE DETERMINED,
         "serverFilesCourse": ["suites/"],
-        "entrypoint": "/grade/setup.py",
+        "entrypoint": "/grader/run.py",
         "timeout" : 60
     }
 ```

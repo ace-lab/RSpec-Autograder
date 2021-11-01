@@ -21,6 +21,7 @@ WORK_DIR: str = f"{ROOT_DIR}/working"
 # this can be defined properly in `parse.py`
 GRADING_SCRIPT: str = GRADING_SCRIPT.format(work=WORK_DIR, file=f"{WORK_DIR}/{ENTRY_FILE}")
 
+print("AYYY, run.py STARTED")
 assert os.path.exists(f"{ROOT_DIR}"), f"ERROR: {ROOT_DIR} not found! Mounting may have failed."
 
 with open(f"{SUITES_DIR}/meta.json", 'r') as info:
