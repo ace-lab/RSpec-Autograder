@@ -4,7 +4,7 @@ from sys import argv
 from re import match as re_match
 from json import dumps as json_dumps
 from json import loads as json_loads
-from typing import Dict
+from typing import Dict, Tuple
 from suite import Suite
 from parse import parseOutput, GRADING_SCRIPT, ENTRY_FILE
 
@@ -58,11 +58,11 @@ def load_suite(suite_name: str, solution: bool) -> Suite:
     ## but we accidentally copy in the submission again, so let's remove that
     os.system(f"rm {WORK_DIR}/{grading_info['submission_root']}/_submission_file")
 
-def runSuite(suite_name: str, solution: bool) -> Suite:
+def runSuite(suite_name: str, solution: bool) -> Tuple[Suite, str]:
     """Prepares, runs, and parses the execution of a suite from its name (its folder)"""
     load_suite(suite_name=suite_name, solution=solution)
     output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
-    return parseOutput(output=output, name=suite_name)
+    return parseOutput(output=output, name=suite_name), str
 
 if __name__ == '__main__':
     
@@ -91,10 +91,14 @@ if __name__ == '__main__':
         )
 
     for suite in lsSuites():
-        ref: Suite = runSuite(suite_name=suite, solution=True)
-        sub: Suite = runSuite(suite_name=suite, solution=False)
+        ref, ref_out = runSuite(suite_name=suite, solution=True)
+        sub, sub_out = runSuite(suite_name=suite, solution=False)
 
         score_report = Suite.grade(ref, sub)
+        score_report.update({
+            "reference_output" : ref_out,
+            "submission_output" : sub_out
+        })
         gradingData['tests'].append(score_report)
 
 
