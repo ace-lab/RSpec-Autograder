@@ -5,7 +5,7 @@ from json import loads as json_loads
 import pdb
 
 # can use {work} for the working dir and {file} for ENTRY_FILE absolute path
-GRADING_SCRIPT = 'cd {work} && bundle install > /dev/null && /usr/bin/rspec --format json' 
+GRADING_SCRIPT = 'cd {work} && bundle install --local > /dev/null && bundle exec rspec --format json' 
 # GRADING_SCRIPT = 'su - autograder -c "pwd"'
 
 ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specific file

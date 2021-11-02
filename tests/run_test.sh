@@ -24,16 +24,16 @@ mkdir .testing/grader
 
 # load the suites
 suite_dir="$(pwd)/$1/"
-cp -r $suite_dir/* .testing/serverFilesCourse/suites
+cp -r $suite_dir/* .testing/tests/
 ## clean out the data.json, submission dir, and expected result
 ### data.json
-mv .testing/serverFilesCourse/suites/data.json .testing/data/
+mv .testing/tests/data.json .testing/data/
 ### student files
 cp $suite_dir/submission/* .testing/student
 #### we don't want _submission_file in student/
 rm .testing/student/_submission_file
 #### nor do we want the submission dir already there, since writers shouldn't have to have it there
-rm -r .testing/serverFilesCourse/suites/submission
+rm -r .testing/tests/submission
 
 # load the expected results
 cp $suite_dir/expected.json .testing

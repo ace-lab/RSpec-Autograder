@@ -6,7 +6,6 @@ RUN mkdir /grade
 RUN mkdir /grade/data
 RUN mkdir /grade/results
 RUN mkdir /grade/serverFilesCourse
-RUN mkdir /grade/serverFilesCourse/suites
 RUN mkdir /grade/student
 RUN mkdir /grade/tests
 RUN mkdir /grader

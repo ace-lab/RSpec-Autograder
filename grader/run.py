@@ -10,7 +10,7 @@ from parse import parseOutput, GRADING_SCRIPT, ENTRY_FILE
 
 ROOT_DIR: str = '/grade' if len(argv) < 2 else argv[1]
 
-SUITES_DIR: str = f"{ROOT_DIR}/serverFilesCourse/suites"
+SUITES_DIR: str = f"{ROOT_DIR}/tests"
 SOLUTION_DIR: str = f"{SUITES_DIR}/solution"
 SUBMISSION_DIR: str = f"{SUITES_DIR}/submission"
 
@@ -21,13 +21,14 @@ WORK_DIR: str = f"{ROOT_DIR}/working"
 # this can be defined properly in `parse.py`
 GRADING_SCRIPT: str = GRADING_SCRIPT.format(work=WORK_DIR, file=f"{WORK_DIR}/{ENTRY_FILE}")
 
-print("AYYY, run.py STARTED")
 assert os.path.exists(f"{ROOT_DIR}"), f"ERROR: {ROOT_DIR} not found! Mounting may have failed."
 
 with open(f"{SUITES_DIR}/meta.json", 'r') as info:
     grading_info = json_loads(info.read())
 with open(f"{ROOT_DIR}/data/data.json", 'r') as data:
-    submission_data = json_loads(data.read())   
+    content = data.read()
+    print(content)
+    submission_data = json_loads(content)
 
 def lsSuites(dir: str = SUITES_DIR):
     """get the folder names that match SUITE_REGEX"""
@@ -62,7 +63,7 @@ def runSuite(suite_name: str, solution: bool) -> Tuple[Suite, str]:
     """Prepares, runs, and parses the execution of a suite from its name (its folder)"""
     load_suite(suite_name=suite_name, solution=solution)
     output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
-    return parseOutput(output=output, name=suite_name), str
+    return parseOutput(output=output, name=suite_name), output
 
 if __name__ == '__main__':
     
@@ -87,9 +88,11 @@ if __name__ == '__main__':
     #   into the end of f"{SUBMISSION_DIR}/_submission_file"
     with open(f"{SUBMISSION_DIR}/_submission_file", 'a') as sub:
         sub.write(
-            submission_data['submission']['submitted_answer']['student-parsons-solution']
+            submission_data['submitted_answers']['student-parsons-solution']
         )
 
+    pts = 0
+    max_pts = 0
     for suite in lsSuites():
         ref, ref_out = runSuite(suite_name=suite, solution=True)
         sub, sub_out = runSuite(suite_name=suite, solution=False)
@@ -100,8 +103,13 @@ if __name__ == '__main__':
             "submission_output" : sub_out
         })
         gradingData['tests'].append(score_report)
+        pts += score_report['points']
+        max_pts += score_report['max_points']
 
 
+    gradingData['score'] = pts / max_pts
+
+    print(gradingData)
     with open(f'{ROOT_DIR}/results/results.json', 'w') as results:
         json_data: str = json_dumps(gradingData)
         results.write(json_data)
