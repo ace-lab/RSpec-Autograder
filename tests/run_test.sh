@@ -57,11 +57,14 @@ echo ========================= FINISHED =========================
 
 
 # compare the result
-echo ========================= DIFF RESULTS =========================
+echo ========================= COMPARISON =========================
 echo
-diff .testing/results/results.json $suite_dir/expected.json
+python3 verify_out.py $suite_dir/expected.json
 echo
-echo =========================== END DIFF ===========================
+echo =========================== END COMPARISON ===========================
+
+# cp bruh question1/expected.json
+# cp .testing/results/results.json bruh
 
 
 # and clean up

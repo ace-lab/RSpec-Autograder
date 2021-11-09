@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 from sys import argv
+from pprint import pformat, pprint
 from re import match as re_match
 from json import dumps as json_dumps
 from json import loads as json_loads
@@ -27,7 +28,7 @@ with open(f"{SUITES_DIR}/meta.json", 'r') as info:
     grading_info = json_loads(info.read())
 with open(f"{ROOT_DIR}/data/data.json", 'r') as data:
     content = data.read()
-    print(content)
+    # print(content)
     submission_data = json_loads(content)
 
 def lsSuites(dir: str = SUITES_DIR):
@@ -63,6 +64,7 @@ def runSuite(suite_name: str, solution: bool) -> Tuple[Suite, str]:
     """Prepares, runs, and parses the execution of a suite from its name (its folder)"""
     load_suite(suite_name=suite_name, solution=solution)
     output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
+    # print(f"OUT: {output}")
     return parseOutput(output=output, name=suite_name), output
 
 if __name__ == '__main__':
@@ -109,7 +111,11 @@ if __name__ == '__main__':
 
     gradingData['score'] = pts / max_pts
 
-    print(gradingData)
-    with open(f'{ROOT_DIR}/results/results.json', 'w') as results:
+    # print(gradingData)
+    # assert os.path.exists(f"{ROOT_DIR}/results")
+    # print(os.popen(f"ls {ROOT_DIR}").read())
+    os.mkdir(f"{ROOT_DIR}/results")
+    with open(f'{ROOT_DIR}/results/results.json', 'w+') as results:
         json_data: str = json_dumps(gradingData)
+        pprint(gradingData)
         results.write(json_data)

@@ -9,13 +9,16 @@ class Failure(object):
     def asdict(self) -> Dict[str, str]:
         return {
             'error_message' : self.err_msg,
-            'line_of_error' : self.line_of_error
+            'exception' : self.exception
         }
 
     def __eq__(self, o) -> bool:
         same_ex = self.exception == o.exception
         
         return same_ex # and same_stack # maybe include stack ?
+
+    def __repr__(self) -> str:
+        return f"Failure({self.exception}: {self.err_msg})"
 
 class Test(object):
     def __init__(self, id: str, desc: str, fail: Failure) -> None:
@@ -24,10 +27,19 @@ class Test(object):
         self.passed = fail is None
         self.failure = fail
 
+    def __repr__(self) -> str:
+        base = f"{self.id}: {self.description}"
+        return base + ("pass" if self.passed else f"{self.failure}")
+
 class Suite(object):
     def __init__(self, tests: Dict[str, Test], id: str) -> None:
         self.tests = tests
         self.id = id
+
+    def __repr__(self) -> str:
+        f"Suite({self.id},\n\t" + \
+            '\n\t'.join([f"{test}" for test in self.tests]) + \
+            '\n)'
 
     def grade(self, reference) -> Dict:
         return Suite.grade(self, reference)
@@ -46,12 +58,12 @@ class Suite(object):
             if sub is None:
                 raise ValueError(f"Submission does not contain graded test [{testID}]")
 
-            if ref.failure != sub.failure:
+            if ref.passed != sub.passed:
                 fails.append({
                     'id' : testID,
                     'desc' : sub.description,
-                    'reference' : ref.failure.asdict(),
-                    'submission' : sub.failure.asdict()
+                    'reference' : "passed" if ref.passed else ref.failure.asdict(),
+                    'submission' : "passed" if sub.passed else sub.failure.asdict()
                 })
             else:
                 score += 1

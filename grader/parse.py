@@ -5,8 +5,12 @@ from json import loads as json_loads
 import pdb
 
 # can use {work} for the working dir and {file} for ENTRY_FILE absolute path
-GRADING_SCRIPT = 'cd {work} && bundle install --local > /dev/null && bundle exec rspec --format json' 
-# GRADING_SCRIPT = 'su - autograder -c "pwd"'
+GRADING_SCRIPT = "&&".join([
+    'cd {work}',
+    # 'bundle config path /grader/vendor/bundle',
+    'bundle install --quiet',
+    'rspec --format json' 
+])
 
 ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specific file
 # alternative to this len is to have a delimeter that splits 

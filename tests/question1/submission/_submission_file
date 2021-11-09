@@ -1,7 +1,0 @@
-describe 'even?' do
-    it 'should return true on even numbers [00]' do
-        (2..10).step(2).each do |n|
-            expect(even?(n)).to eq false
-        end
-    end
-end
