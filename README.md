@@ -45,7 +45,7 @@ For each suite (consider `<suite_i>`) the following is done:
     - all files will be copied as-is
     - excepting `_submission_file`, which will be appended to the file detailed in `meta.json`
 5) run the `GRADING_SCRIPT` and serialize the output into `Suite` objects
-   1) `GRADING_SCRIPT` is defined in `grader/parse.py` and without source modification is   
+    - `GRADING_SCRIPT` is defined in `grader/parse.py` and without source modification is   
       ```$ cd working/ && bundle install --quiet && rspec --format json```
 6) repeat steps 1-3
 7) load the student submission (which will be loaded into `suites/submission` upon launch of the image) into `working/`
