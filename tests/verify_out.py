@@ -1,6 +1,7 @@
 from json import loads as json_loads
 from sys import argv, exit
 
+assert len(argv) > 1, "usage: verify_out.py <path/to/expected.json>"
 exp_path = argv[1]
 
 with open(exp_path, 'r') as f:
@@ -10,17 +11,11 @@ with open('.testing/results/results.json') as f:
     res = json_loads(f.read())
 
 res_parsed = {}
-for suite in res['tests']:
-    res_parsed[suite['name']] = suite
-    res_parsed[suite['name']].pop('reference_output')
-    res_parsed[suite['name']].pop('submission_output')
-
-
+for test in res['tests']:
+    res_parsed[test['name']] = test
 exp_parsed = {}
-for suite in exp['tests']:
-    exp_parsed[suite['name']] = suite
-    exp_parsed[suite['name']].pop('reference_output')
-    exp_parsed[suite['name']].pop('submission_output')
+for test in exp['tests']:
+    exp_parsed[test['name']] = test
 
 if exp_parsed == res_parsed:
     print(f"No difference found")

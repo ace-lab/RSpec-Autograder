@@ -21,56 +21,70 @@ class Failure(object):
         return f"Failure({self.exception}: {self.err_msg})"
 
 class Test(object):
-    def __init__(self, id: str, desc: str, fail: Failure) -> None:
-        self.id = id
+    def __init__(self, desc: str, fail: Failure) -> None:
+        # self.id = id
         self.description = desc
         self.passed = fail is None
         self.failure = fail
 
     def __repr__(self) -> str:
-        base = f"{self.id}: {self.description}"
-        return base + ("pass" if self.passed else f"{self.failure}")
+        base = f"{self.description}: {self.passed}"
+        return base #+ ("pass" if self.passed else f"{self.failure}")
 
-class Suite(object):
+class Var(object):
     def __init__(self, tests: Dict[str, Test], id: str) -> None:
         self.tests = tests
         self.id = id
 
     def __repr__(self) -> str:
-        f"Suite({self.id},\n\t" + \
+        f"Var({self.id},\n\t" + \
             '\n\t'.join([f"{test}" for test in self.tests]) + \
             '\n)'
 
     def grade(self, reference) -> Dict:
-        return Suite.grade(self, reference)
+        return Var.grade(self, reference)
 
     @classmethod
     def grade(cls, reference, submission) -> Dict:
-        fails: List[Dict[str, str]] = []
-        score: int = 0
+        # fails: List[Dict[str, str]] = []
+        # score: int = 0
+        out = { }
 
-        # assert False, f"ref: {reference.tests} \n\n\nsub: {submission.tests}"
-
+        # msg = ""
         for testID in reference.tests.keys():
             ref: Test = reference.tests.get(testID)
             sub: Test = submission.tests.get(testID)
 
-            if sub is None:
-                raise ValueError(f"Submission does not contain graded test [{testID}]")
-
-            if ref.passed != sub.passed:
-                fails.append({
-                    'id' : testID,
-                    'desc' : sub.description,
-                    'reference' : "passed" if ref.passed else ref.failure.asdict(),
-                    'submission' : "passed" if sub.passed else sub.failure.asdict()
-                })
+            out[testID] = {
+                'correct' : False
+            }
+            
+            # msg += f"`{ref.description}` : "
+            if sub is None: 
+                msg = "not found\n"
+            elif ref.passed != sub.passed:
+                refRes = 'pass' if ref.passed else 'fail'
+                subRes = 'pass' if sub.passed else 'fail'
+                msg = f"should {refRes} but {subRes}ed\n"
+                if ref.passed:
+                    msg += sub.failure.err_msg + '\n'
             else:
-                score += 1
+                # when we fail as expected but don't fail due to an assertion
+                if (not ref.passed) and (sub.failure.exception != ref.failure.exception):
+                    msg = f"failed to unexpected error\n{sub.failure.err_msg}\n"
+                    # if not, `continue`
+                    continue
+                msg = f"{'pass' if ref.passed else 'fail'}ed as intended\n"
+                out[testID]['correct'] = True
+            out[testID].update({
+                "message" : msg,
+                "supposed to pass" : ref.passed
+            })
 
-        return {
-            'name' : f"Suite {reference.id}",
-            'points' : score,
-            'max_points' : len(reference.tests),
-            'fails' : fails 
-        }
+        return out
+        # {
+        #     'name' : reference.id,
+        #     'points' : score,
+        #     'max_points' : len(reference.tests),
+        #     'message' : msg
+        # }

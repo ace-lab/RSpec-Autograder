@@ -1,5 +1,5 @@
 from typing import Dict
-from suite import Suite, Test, Failure
+from suite import Var, Test, Failure
 from json import loads as json_loads
 
 import pdb
@@ -15,18 +15,18 @@ GRADING_SCRIPT = "&&".join([
 ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specific file
 # alternative to this len is to have a delimeter that splits 
 #   the test name into a test description and an ID
-ID_LEN = 4 # this is the length of each test id (e.g. 4 for '[12]', 3 for '124')
+# ID_LEN = 4 # this is the length of each test id (e.g. 4 for '[12]', 3 for '124')
 
 
-def parseOutput(output: str, name: str) -> Suite:
-    """Function to parse the output of the GRADING_SCRIPT into a <Suite> instance"""
+def parseOutput(output: str, name: str) -> Var:
+    """Function to parse the output of the GRADING_SCRIPT into a <Var> instance"""
 
     out = json_loads(output)
     
     parsed_tests: Dict[str, Test] = {}
     for rspec_test in out['examples']:
-        test_id = rspec_test['full_description'][-(ID_LEN):]
-        test_name = rspec_test['full_description'][:-(ID_LEN)]
+        test_id = rspec_test['full_description']#[-(ID_LEN):]
+        # test_name = rspec_test['full_description'][:-(ID_LEN)]
         
         if rspec_test['status'] == 'passed':
             failure = None
@@ -39,8 +39,8 @@ def parseOutput(output: str, name: str) -> Suite:
                 backtrace=ex['backtrace']
             )
 
-        test = Test(test_id, test_name, failure)
+        test = Test(test_id, failure)
 
         parsed_tests[test_id] = test
 
-    return Suite(parsed_tests, name)
+    return Var(parsed_tests, name)

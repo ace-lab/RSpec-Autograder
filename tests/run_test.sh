@@ -49,7 +49,12 @@ im="$(sudo docker build -q . | cut -d: -f2)"
 echo image: $im
 cont="$(sudo docker run -d $im /grader/run.py)"
 echo container: $cont
-echo container exited with code "$(sudo docker container wait $cont)"
+code="$(sudo docker container wait $cont)"
+echo container exited with code $code
+if [[ $code == "1" ]]; then
+    echo ========================= FINISHED =========================
+    exit
+fi
 sudo docker cp $cont:grade/results/results.json ./.testing/results/results.json
 sudo docker container rm $cont > /dev/null
 echo 
