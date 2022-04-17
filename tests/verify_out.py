@@ -7,7 +7,7 @@ exp_path = argv[1]
 with open(exp_path, 'r') as f:
     exp = json_loads(f.read())
 
-with open('.testing/results/results.json') as f:
+with open('.testing/grade/results/results.json') as f:
     res = json_loads(f.read())
 
 res_parsed = {}
