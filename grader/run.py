@@ -56,7 +56,7 @@ def load_var(var_name: str, solution: bool) -> Var:
     ## append the submitted code snippet
     os.system(f"cat {sub_dir}/_submission_file >> {WORK_DIR}/{grading_info['submission_file']}")
     ## and all additionally submitted files
-    if grading_info.has_key('submission_root'):
+    if 'submission_root' in grading_info.keys():
         os.system(f"cp {sub_dir}/* {WORK_DIR}/{grading_info['submission_root']}/")
     ## but we accidentally copy in the submission again, so let's remove that
     os.system(f"rm {WORK_DIR}/{grading_info['submission_root']}/_submission_file")
