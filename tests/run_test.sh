@@ -14,40 +14,42 @@
 
 # make all the necessary dirs
 mkdir .testing
-mkdir .testing/data
-mkdir .testing/results
-mkdir .testing/serverFilesCourse
-mkdir .testing/serverFilesCourse/suites
-mkdir .testing/student
-mkdir .testing/tests
-mkdir .testing/grader
 
-# load the suites
-suite_dir="$(pwd)/$1/"
-cp -r $suite_dir/* .testing/tests/
+mkdir .testing/grade
+mkdir .testing/grade/data
+mkdir .testing/grade/serverFilesCourse
+mkdir .testing/grade/student
+mkdir .testing/grade/tests
+
+mkdir .testing/results
+
+# load the variants
+variant_dir="$(pwd)/$1/"
+cp -r $variant_dir/* .testing/grade/tests/
 ## clean out the data.json, submission dir, and expected result
 ### data.json
-mv .testing/tests/data.json .testing/data/
+mv .testing/grade/tests/data.json .testing/grade/data/
 ### student files
-cp $suite_dir/submission/* .testing/student
-#### we don't want _submission_file in student/
-rm .testing/student/_submission_file
-#### nor do we want the submission dir already there, since writers shouldn't have to have it there
-rm -r .testing/tests/submission
+if [[ -d $variant_dir/submission ]]; then
+    cp $variant_dir/submission/* .testing/grade/student
+    #### we don't want _submission_file in student/
+    rm .testing/grade/student/_submission_file
+    #### nor do we want the submission dir already there, since writers shouldn't have to have it there
+    rm -r .testing/grade/tests/submission
+fi
+### expected result
+rm .testing/grade/tests/expected.json
 
 # load the expected results
-cp $suite_dir/expected.json .testing
+cp $variant_dir/expected.json .testing
 
-# load the grader
-cp ../grader/* .testing/grader
-chmod +x .testing/grader/run.py
-# and run it
+# run it
 echo ==================== RUNNING THE GRADER ====================
 echo
 # only report errors
-im="$(sudo docker build -q . | cut -d: -f2)"
+im="$(sudo docker build -q .. | cut -d: -f2)"
 echo image: $im
-cont="$(sudo docker run -d $im /grader/run.py)"
+cont="$(sudo docker run --mount type=bind,source=`pwd`/.testing/grade,target=/grade -d $im /grader/run.py)"
 echo container: $cont
 code="$(sudo docker container wait $cont)"
 echo container exited with code $code

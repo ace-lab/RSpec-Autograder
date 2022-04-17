@@ -1,4 +1,4 @@
-FROM alpine:3.14
+FROM ruby:2.6-alpine3.14
 
 RUN apk update 
 RUN apk upgrade
@@ -12,3 +12,5 @@ RUN gem install json rspec
 RUN mkdir /grader
 COPY grader /grader
 RUN chmod +x /grader/run.py
+
+CMD sh
