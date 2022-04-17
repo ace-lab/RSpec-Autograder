@@ -28,7 +28,7 @@ class Test(object):
         self.failure = fail
 
     def __repr__(self) -> str:
-        base = f"{self.description}: {self.passed}"
+        base = f"{self.description}: {'passed' if self.passed else 'failed'}"
         return base #+ ("pass" if self.passed else f"{self.failure}")
 
 class Var(object):
@@ -60,8 +60,11 @@ class Var(object):
             }
             
             # msg += f"`{ref.description}` : "
+
             if sub is None: 
                 msg = "not found\n"
+                import code
+                code.interact()
             elif ref.passed != sub.passed:
                 refRes = 'pass' if ref.passed else 'fail'
                 subRes = 'pass' if sub.passed else 'fail'

@@ -37,12 +37,11 @@ cp $variant_dir/expected.json .testing
 echo ==================== RUNNING THE GRADER ====================
 echo
 # only report errors
-im="$(sudo docker build -q .. | cut -d: -f2)"
-echo image: $im
+im="$(sudo docker build -q -t rspec-autograder:dev ..  | cut -d: -f2)"
+echo \> Image name/hash: rspec-autograder:dev / $im
 cont="$(sudo docker run --mount type=bind,source=`pwd`/.testing/grade,target=/grade -d $im /grader/run.py)"
-echo container: $cont
-code="$(sudo docker container wait $cont)"
 echo \> Container hash: $cont
+code="$(sudo docker container wait $cont)"
 echo \> Container exited with code "$(sudo docker container wait $cont)"
 if [[ $code == "1" ]]; then
     echo ========================= FINISHED =========================
@@ -57,7 +56,7 @@ echo ========================== FINISHED ==========================
 # compare the result
 echo ========================= COMPARISON =========================
 echo
-python3 verify_out.py $suite_dir/expected.json
+python3 verify_out.py $variant_dir/expected.json
 echo
 echo ======================= END COMPARISON =======================
 

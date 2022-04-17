@@ -89,7 +89,7 @@ if __name__ == '__main__':
     
     # copy student submission from /grade/data/data.json 
     #   into the end of f"{SUBMISSION_DIR}/_submission_file"
-    with open(f"{SUBMISSION_DIR}/_submission_file", 'a') as sub:
+    with open(f"{SUBMISSION_DIR}/_submission_file", 'w') as sub:
         sub.write(
             submission_data['submitted_answers']['student-parsons-solution']
         )
@@ -159,7 +159,8 @@ if __name__ == '__main__':
     # print(gradingData)
     # assert os.path.exists(f"{ROOT_DIR}/results")
     # print(os.popen(f"ls {ROOT_DIR}").read())
-    os.mkdir(f"{ROOT_DIR}/results")
+    if not os.path.exists(out_path := f"{ROOT_DIR}/results"):
+        os.mkdir(out_path)
     with open(f'{ROOT_DIR}/results/results.json', 'w+') as results:
         json_data: str = json_dumps(gradingData)
         pprint(gradingData)

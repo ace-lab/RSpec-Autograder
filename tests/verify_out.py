@@ -21,10 +21,21 @@ if exp_parsed == res_parsed:
     print(f"No difference found")
     exit()
 else:
-    r = set(res_parsed.items())
-    e = set(exp_parsed.items())
-    diff = e ^ r
-    print(f"{len(diff)} differences found:")
-    print(diff)
+    expected = []
+    unexpected = []
+    different = []
+    for test, grades in exp_parsed.items():
+        if test not in res_parsed.items():
+            expected.append((test, grades))
+        elif res_parsed[test] != grades:
+            different.append(test)
+
+    for test, grades in res_parsed.items():
+        if test not in exp_parsed.items():
+            unexpected.append((test, grades))
+    print(f"{len(expected)} expected tests not found")
+    print(f"{len(unexpected)} unexpected tests found")
+    print(f"{len(different)} differing grades found")
+    print("Run with python -i to inspect `expected`, `unexpected`, and `different`")
 
 
