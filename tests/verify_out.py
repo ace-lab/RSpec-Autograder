@@ -1,13 +1,14 @@
 from json import loads as json_loads
 from sys import argv, exit
 
-assert len(argv) > 1, "usage: verify_out.py <path/to/expected.json>"
+assert len(argv) > 2, "usage: verify_out.py <path/to/expected.json> <path/to/produced.json>"
 exp_path = argv[1]
+res_path = argv[2]
 
 with open(exp_path, 'r') as f:
     exp = json_loads(f.read())
 
-with open('.testing/grade/results/results.json') as f:
+with open(res_path, 'r') as f:
     res = json_loads(f.read())
 
 res_parsed = {}
