@@ -7,7 +7,7 @@ from json import dumps as json_dumps
 from json import loads as json_loads
 from typing import Dict, Tuple
 from suite import Var
-from parse import parseOutput, GRADING_SCRIPT, ENTRY_FILE
+from parse import parseOutput, verifyOutput, GRADING_SCRIPT, ENTRY_FILE
 
 ROOT_DIR: str = '/grade' if len(argv) < 2 else argv[1]
 
@@ -65,6 +65,11 @@ def runVar(var_name: str, solution: bool) -> Tuple[Var, str]:
     """Prepares, runs, and parses the execution of a variant from its name (its folder)"""
     load_var(var_name=var_name, solution=solution)
     output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
+    if not verifyOutput(output):
+        suite = "instructor" if solution else "student"
+        print(f"Error when running variant {var_name} on {suite} suite. Output:")
+        print(f"> {output}")
+        exit(1)
     # print(f"OUT: {output}")
     vname = var_name[len("var_"):] # cut out the "var_" at the front
     vname = vname.capitalize() # fix capitalization ("hello_There" -> "Hello_there")
@@ -85,6 +90,7 @@ if __name__ == '__main__':
     if not os.path.exists(SUBMISSION_DIR):
         os.mkdir(SUBMISSION_DIR)
     # there may not be files in student/, so we just hide the error
+    # TODO: check if files exist before doing this
     os.system(f"cp {ROOT_DIR}/student/* {SUBMISSION_DIR} 2> /dev/null")
     
     # copy student submission from /grade/data/data.json 
@@ -137,28 +143,6 @@ if __name__ == '__main__':
     max_pts = sum([ test['max_points'] for test in gradingData['tests'] ])
     gradingData['score'] = pts / max_pts
 
-
-
-    
-    # for var in lsVars():
-    #     ref, ref_out = runVar(var_name=var, solution=True)
-    #     sub, sub_out = runVar(var_name=var, solution=False)
-
-    #     score_report = Var.grade(ref, sub)
-    #     score_report.update({
-    #         "reference_output" : ref_out,
-    #         "submission_output" : sub_out
-    #     })
-    #     gradingData['tests'].append(score_report)
-    #     pts += score_report['points']
-    #     max_pts += score_report['max_points']
-
-
-    # gradingData['score'] = pts / max_pts
-
-    # print(gradingData)
-    # assert os.path.exists(f"{ROOT_DIR}/results")
-    # print(os.popen(f"ls {ROOT_DIR}").read())
     if not os.path.exists(out_path := f"{ROOT_DIR}/results"):
         os.mkdir(out_path)
     with open(f'{ROOT_DIR}/results/results.json', 'w+') as results:

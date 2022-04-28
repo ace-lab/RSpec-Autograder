@@ -1,6 +1,7 @@
 from typing import Dict
 from suite import Var, Test, Failure
 from json import loads as json_loads
+from json.decoder import JSONDecodeError
 
 import pdb
 
@@ -8,7 +9,7 @@ import pdb
 GRADING_SCRIPT = "&&".join([
     'cd {work}',
     # 'bundle config path /grader/vendor/bundle',
-    'bundle install --quiet',
+    'bundle install --local --without production --quiet',
     'rspec --format json' 
 ])
 
@@ -17,6 +18,13 @@ ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specifi
 #   the test name into a test description and an ID
 # ID_LEN = 4 # this is the length of each test id (e.g. 4 for '[12]', 3 for '124')
 
+def verifyOutput(output: str) -> bool:
+    """Returns if the passed string is a valid output"""
+    try:
+        json_loads(output)
+    except JSONDecodeError:
+        return False
+    return True
 
 def parseOutput(output: str, name: str) -> Var:
     """Function to parse the output of the GRADING_SCRIPT into a <Var> instance"""

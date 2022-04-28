@@ -37,7 +37,7 @@ class Var(object):
         self.id = id
 
     def __repr__(self) -> str:
-        f"Var({self.id},\n\t" + \
+        return f"Var({self.id},\n\t" + \
             '\n\t'.join([f"{test}" for test in self.tests]) + \
             '\n)'
 
@@ -46,11 +46,9 @@ class Var(object):
 
     @classmethod
     def grade(cls, reference, submission) -> Dict:
-        # fails: List[Dict[str, str]] = []
-        # score: int = 0
+        """Produce a scoring report from two Variants, first as reference, second as submission"""
         out = { }
 
-        # msg = ""
         for testID in reference.tests.keys():
             ref: Test = reference.tests.get(testID)
             sub: Test = submission.tests.get(testID)
@@ -59,8 +57,6 @@ class Var(object):
                 'correct' : False
             }
             
-            # msg += f"`{ref.description}` : "
-
             if sub is None: 
                 msg = "not found\n"
                 import code
@@ -85,9 +81,3 @@ class Var(object):
             })
 
         return out
-        # {
-        #     'name' : reference.id,
-        #     'points' : score,
-        #     'max_points' : len(reference.tests),
-        #     'message' : msg
-        # }
