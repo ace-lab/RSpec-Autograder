@@ -43,6 +43,13 @@ else
     exit 1
 fi
 
+# now that the files are in place, install the packages
+pd=`pwd`
+cd $variant_dir/common
+bundle package --all --without-production --all-platforms
+bundle install --development
+cd $pd
+
 echo done.
 
 echo Running the grader
