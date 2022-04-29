@@ -17,12 +17,12 @@ To use, add the following to  `info.json`  in your question
     }
 ```
 
-Define a suite to be a version of the codebase that forms a complete program. This project uses "suites" to determine if a student submission is correct. 
+Define a variant to be a version of the codebase that forms a complete program. This project uses "variants" to determine if a student submission is correct. 
 
-A question writer, in their PrarieLearn question, must create 
+A question writer must create the following in their PrarieLearn question
 - the folder `tests/` in the root directory of their question 
   - subfolder `tests/common/`
-    - which will consist of the code that is shared between a majority of the suites
+    - which will contain the code that is shared between variants*
   - json file `tests/meta.json`
     - which will contain 
       - the mapping of `_submission_file` as a value for the key `"submission_file"`
@@ -32,16 +32,23 @@ A question writer, in their PrarieLearn question, must create
   - a number of subfolders `tests/suite<number>`
     - each of which contains the difference from the files in `tests/common/` expressed by including a modified copy of the file that should be replaced/added to `tests/common/`
 
+\* This should include packages gems (from `bundle package --all && bundle install --development`)
+
 Thus, your `tests/` folder should contain something like this:
 ```
 tests/
 +-- common/
+|   +-- .bundle/
+|   +-- spec/
+|   +-- vendor/
+|   +-- Gemfile
+|   +-- Gemfile.lock
 |   `-- replaced.rb
 |
 +-- solution/
 |   +-- _submission_file  # this will hold the instructor's "submission"
 |   |
-|   ...                # any other files can be included*
+|   ...                # any other submitted files can be included*
 |
 +-- suite9001/
 |   `-- replaced.rb    # this file will replace the one in common
@@ -59,7 +66,7 @@ For each suite (consider `<suite_i>`) the following is done:
 4) load the solution into `working/`
     - in which `_submission_file` will be appended to the file detailed in `meta.json`
     - and if `"submission_root"` is defined in `meta.json`, all files are copied to `working/<submission_root>`
-5) run the `GRADING_SCRIPT` and serialize the output into `Suite` objects
+5) run the `GRADING_SCRIPT` (in `parse.py`) and serialize the output into `Suite` objects
     - `GRADING_SCRIPT` is defined in `grader/parse.py` and without source modification is   
       ```$ cd working/ && bundle install --quiet && rspec --format json```
 6) repeat steps 1-3
