@@ -1,0 +1,1 @@
+{"gradable": true, "tests": [{"name": "even? should return true on even numbers", "output": "Case one : should pass but failed\n\nexpected: false\n     got: true\n\n(compared using ==)\n\nDiff:\n@@ -1 +1 @@\n-false\n+true\n\nCase two : should fail but passed\n", "points": 0, "max_points": 2}], "score": 0.0}

@@ -96,10 +96,11 @@ if __name__ == '__main__':
     
     # copy student submission from /grade/data/data.json 
     #   into the end of f"{SUBMISSION_DIR}/_submission_file"
-    with open(f"{SUBMISSION_DIR}/_submission_file", 'w') as sub:
-        sub.write(
-            submission_data['submitted_answers']['student-parsons-solution']
-        )
+    #   and add the pre- and post- text
+    with open(f"{SUBMISSION_DIR}/_submission_file", 'w') as sub: 
+        sub.write( grading_info.get('pre-text', '') )
+        sub.write( submission_data['submitted_answers']['student-parsons-solution'] )
+        sub.write( grading_info.get('post-text', '') )
 
     pts = 0
     max_pts = 0

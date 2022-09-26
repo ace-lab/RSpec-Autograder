@@ -1,8 +1,5 @@
 {
    "params": {
-     "year": 1076,
-     "is_leap_year": true,
-     "is_or_is_not": "is ",
      "random_number": 0.06564160947926911
    },
    "correct_answers": {},

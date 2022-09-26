@@ -21,10 +21,10 @@ ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specifi
 def verifyOutput(output: str) -> bool:
     """Returns if the passed string is a valid output"""
     try:
-        json_loads(output)
+        data = json_loads(output)
     except JSONDecodeError:
         return False
-    return True
+    return data['summary']['errors_outside_of_examples_count'] == 0
 
 def parseOutput(output: str, name: str) -> Var:
     """Function to parse the output of the GRADING_SCRIPT into a <Var> instance"""

@@ -7,7 +7,7 @@ if [[ $? != "0" ]]; then
     echo "jq is required to run this script, please install and add it to your \$PATH"
 fi
 
-echo -n "Preparing mount files ... "
+echo "Preparing mount files ... "
 
 sudo rm -rf .container_mount
 

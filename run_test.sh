@@ -19,4 +19,4 @@ echo
 echo ======================= END COMPARISON =======================
 
 # and clean up
-rm -rf .container_mount
+# rm -rf .container_mount
