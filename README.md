@@ -3,6 +3,7 @@
 ### TODO:
 - (improvement) create an ergonomic way to make questions for this 
   - interface with existing parson's problem generation
+    - see ace-lab/rspec-questionwriter
 
 ## Quickstart:
 
