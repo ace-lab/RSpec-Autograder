@@ -3,8 +3,6 @@ from suite import Var, Test, Failure
 from json import loads as json_loads
 from json.decoder import JSONDecodeError
 
-import pdb
-
 # can use {work} for the working dir and {file} for ENTRY_FILE absolute path
 GRADING_SCRIPT = "&&".join([
     'cd {work}',
@@ -13,10 +11,8 @@ GRADING_SCRIPT = "&&".join([
     'rspec --format json' 
 ])
 
+# this may be helpful if we want to grade a particular script in the submission
 ENTRY_FILE = ' ' # rspec will do everything for us, no need to specify a specific file
-# alternative to this len is to have a delimeter that splits 
-#   the test name into a test description and an ID
-# ID_LEN = 4 # this is the length of each test id (e.g. 4 for '[12]', 3 for '124')
 
 def verifyOutput(output: str) -> bool:
     """Returns if the passed string is a valid output"""

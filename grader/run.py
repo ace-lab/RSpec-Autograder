@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import os
 from sys import argv
-from pprint import pformat, pprint
+from pprint import pprint
 from re import match as re_match
 from json import dumps as json_dumps
 from json import loads as json_loads
