@@ -1,0 +1,17 @@
+{
+    "gradable": true,
+    "tests": [
+        {
+            "name": "GiftCard fails with negative balance", 
+            "output": "Var 1 : not found\nVar 2 : not found\nVar 3 : not found\n", 
+            "points": 0, 
+            "max_points": 3
+        }, {
+            "name": "GiftCard succeeds with positive balance", 
+            "output": "Var 1 : failed as intended\nVar 2 : failed to unexpected error\nundefined method `to' for -20:Integer\nVar 3 : should pass but failed\nundefined method `to' for 20:Integer\n", 
+            "points": 1, 
+            "max_points": 3
+        }
+    ], 
+    "score": 0.16666666666666666
+}

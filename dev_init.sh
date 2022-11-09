@@ -93,6 +93,8 @@ run_test() {
     python3 $script_dir/tests/verify_out.py $1/expected.json $output_loc
     echo
     echo ======================= END COMPARISON =======================
+
+    return
 }
 
 new_test() {
@@ -120,6 +122,11 @@ new_test() {
 }
 
 debug() {
-    sudo docker run -it --rm --mount type=bind,source=`pwd`/.container_mount/grade,target=/grade rspec-autograder:dev
+    sudo docker run -it --rm --mount type=bind,source=`pwd`/.container_mount/grade,target=/grade --mount type=bind,source=`pwd`/debug_tools.sh,target=/tools.sh rspec-autograder:dev
+    return
 }
 
+clean() {
+    rm -rf .container_mount
+    return
+}
