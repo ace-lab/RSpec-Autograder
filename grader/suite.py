@@ -45,11 +45,16 @@ class Var(object):
         return Var.grade(self, reference)
 
     @classmethod
-    def grade(cls, reference, submission) -> Dict:
+    def grade(cls, reference, submission, exclude_filter = []) -> Dict:
         """Produce a scoring report from two Variants, first as reference, second as submission"""
         out = { }
 
-        for testID in reference.tests.keys():
+        tests_to_grade = filter(lambda e: e not in exclude_filter, reference.tests.keys())
+
+        # import code
+        # code.interact(local=locals())
+
+        for testID in tests_to_grade:
             ref: Test = reference.tests.get(testID)
             sub: Test = submission.tests.get(testID)
 
