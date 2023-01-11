@@ -1,0 +1,19 @@
+{
+    "gradable":true,
+    "tests":[
+       {
+          "name":"GiftCard fails with negative balance",
+          "output":"Var 1 : failed by wrong assertion\nVar 2 : failed by wrong assertion\nVar 3 : failed by wrong assertion\n",
+          "points":0,
+          "max_points":3
+       },
+       {
+          "name":"GiftCard succeeds with positive balance",
+          "output":"Var 1 : not found\nVar 2 : not found\nVar 3 : not found\n",
+          "points":0,
+          "max_points":3
+       }
+    ],
+    "score":0.0
+ }
+ 

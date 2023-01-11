@@ -45,11 +45,16 @@ class Var(object):
         return Var.grade(self, reference)
 
     @classmethod
-    def grade(cls, reference, submission) -> Dict:
+    def grade(cls, reference, submission, exclude_filter = []) -> Dict:
         """Produce a scoring report from two Variants, first as reference, second as submission"""
         out = { }
 
-        for testID in reference.tests.keys():
+        tests_to_grade = filter(lambda e: e not in exclude_filter, reference.tests.keys())
+
+        # import code
+        # code.interact(local=locals())
+
+        for testID in tests_to_grade:
             ref: Test = reference.tests.get(testID)
             sub: Test = submission.tests.get(testID)
 
@@ -59,20 +64,21 @@ class Var(object):
             
             if sub is None: 
                 msg = "not found\n"
-                import code
-                code.interact()
             elif ref.passed != sub.passed:
                 refRes = 'pass' if ref.passed else 'fail'
                 subRes = 'pass' if sub.passed else 'fail'
                 msg = f"should {refRes} but {subRes}ed\n"
                 if ref.passed:
                     msg += sub.failure.err_msg + '\n'
-            else:
+            elif (not ref.passed) and (sub.failure.exception != ref.failure.exception):
                 # when we fail as expected but don't fail due to an assertion
-                if (not ref.passed) and (sub.failure.exception != ref.failure.exception):
-                    msg = f"failed to unexpected error\n{sub.failure.err_msg}\n"
-                    # if not, `continue`
-                    continue
+                msg = f"failed to unexpected error\n{sub.failure.err_msg}\n"
+                # continue
+            elif (not ref.passed) and (sub.failure.err_msg.split('\n')[0] != ref.failure.err_msg.split('\n')[0]):
+                # when we *do* fail by an assertion, but the assertion is wrong
+                msg = f"failed by wrong assertion\n"
+                # continue
+            else:
                 msg = f"{'pass' if ref.passed else 'fail'}ed as intended\n"
                 out[testID]['correct'] = True
             out[testID].update({

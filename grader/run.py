@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import os
 from sys import argv
-from pprint import pformat, pprint
+from pprint import pprint
 from re import match as re_match
 from json import dumps as json_dumps
 from json import loads as json_loads
@@ -22,7 +22,8 @@ WORK_DIR: str = f"{ROOT_DIR}/working"
 # this can be defined properly in `parse.py`
 GRADING_SCRIPT: str = GRADING_SCRIPT.format(work=WORK_DIR, file=f"{WORK_DIR}/{ENTRY_FILE}")
 
-assert os.path.exists(f"{ROOT_DIR}"), f"ERROR: {ROOT_DIR} not found! Mounting may have failed."
+if not os.path.exists(f"{ROOT_DIR}"):
+    raise Exception(f"ERROR: {ROOT_DIR} not found! Mounting may have failed.")
 
 with open(f"{VARS_DIR}/meta.json", 'r') as info:
     grading_info = json_loads(info.read())
@@ -95,26 +96,34 @@ if __name__ == '__main__':
     
     # copy student submission from /grade/data/data.json 
     #   into the end of f"{SUBMISSION_DIR}/_submission_file"
-    with open(f"{SUBMISSION_DIR}/_submission_file", 'w') as sub:
-        sub.write(
-            submission_data['submitted_answers']['student-parsons-solution']
-        )
+    #   and add the pre- and post- text
+    with open(f"{SUBMISSION_DIR}/_submission_file", 'w') as sub: 
+        sub.write( grading_info.get('pre-text', '') )
+        sub.write( submission_data['submitted_answers']['student-parsons-solution'] )
+        sub.write( grading_info.get('post-text', '') )
 
     pts = 0
     max_pts = 0
     out = { }
-    # if False:
+    exclusions = grading_info.get("grading_exclusions", {})
+
     vars = lsVars()
     var = next(vars)
     ref_var, ref_out = runVar(var_name=var, solution=True)
     sub_var, sub_out = runVar(var_name=var, solution=False)
 
-    report = Var.grade(ref_var, sub_var)
+    report = Var.grade(ref_var, sub_var, exclude_filter=exclusions.get(var[len("var_"):], []))
     for testID, data in report.items():
         out[testID] = {
             'message' : f"{ref_var.id} : {data['message']}",
             'points' : data['correct'],
             'max_points' : 1
+        }
+    for testID in exclusions.get(var[len("var_"):], []):
+        out[testID] = {
+            'message' : '',
+            'points' : 0,
+            'max_points' : 0
         }
         
 
@@ -122,9 +131,9 @@ if __name__ == '__main__':
         ref_var, ref_out = runVar(var_name=var, solution=True)
         sub_var, sub_out = runVar(var_name=var, solution=False)
 
-        report = Var.grade(ref_var, sub_var)
+        report = Var.grade(ref_var, sub_var, exclude_filter=exclusions.get(var[len("var_"):], []))
 
-        for testID, data in report.items():
+        for testID, data in report.items(): # TODO: make sure that no unexpected derefs are done
             out[testID]['message'] += f"{ref_var.id} : {data['message']}"
             out[testID]['points'] += int(data['correct'])
             out[testID]['max_points'] += 1
