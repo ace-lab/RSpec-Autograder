@@ -102,41 +102,23 @@ if __name__ == '__main__':
         sub.write( submission_data['submitted_answers']['student-parsons-solution'] )
         sub.write( grading_info.get('post-text', '') )
 
-    pts = 0
-    max_pts = 0
-    out = { }
-    exclusions = grading_info.get("grading_exclusions", {})
-
+    
     vars = lsVars()
-    var = next(vars)
-    ref_var, ref_out = runVar(var_name=var, solution=True)
-    sub_var, sub_out = runVar(var_name=var, solution=False)
-
-    report = Var.grade(ref_var, sub_var, exclude_filter=exclusions.get(var[len("var_"):], []))
-    for testID, data in report.items():
-        out[testID] = {
-            'message' : f"{ref_var.id} : {data['message']}",
-            'points' : data['correct'],
-            'max_points' : 1
-        }
-    for testID in exclusions.get(var[len("var_"):], []):
-        out[testID] = {
-            'message' : '',
-            'points' : 0,
-            'max_points' : 0
-        }
-        
+    emptyTest = { 'message': '', 'points': 0, 'max_points': 0 }
+    out = { }
 
     for var in vars:
         ref_var, ref_out = runVar(var_name=var, solution=True)
         sub_var, sub_out = runVar(var_name=var, solution=False)
 
-        report = Var.grade(ref_var, sub_var, exclude_filter=exclusions.get(var[len("var_"):], []))
+        report = Var.grade(ref_var, sub_var)
 
         for testID, data in report.items(): # TODO: make sure that no unexpected derefs are done
-            out[testID]['message'] += f"{ref_var.id} : {data['message']}"
-            out[testID]['points'] += int(data['correct'])
-            out[testID]['max_points'] += 1
+            out[testID] = {
+                'message' : out.get(testID, emptyTest)['message'] + f"{ref_var.id} : {data['message']}",
+                'points' : out.get(testID, emptyTest)['points'] + int(data['correct']),
+                'max_points' : out.get(testID, emptyTest)['max_points'] + 1
+            }
 
     gradingData['tests'] = [ 
         {

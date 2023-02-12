@@ -45,45 +45,42 @@ class Var(object):
         return Var.grade(self, reference)
 
     @classmethod
-    def grade(cls, reference, submission, exclude_filter = []) -> Dict:
+    def grade(cls, reference, submission) -> Dict:
         """Produce a scoring report from two Variants, first as reference, second as submission"""
         out = { }
 
-        tests_to_grade = filter(lambda e: e not in exclude_filter, reference.tests.keys())
-
-        # import code
-        # code.interact(local=locals())
-
-        for testID in tests_to_grade:
+        for testID in reference.tests.keys():
             ref: Test = reference.tests.get(testID)
             sub: Test = submission.tests.get(testID)
-
-            out[testID] = {
-                'correct' : False
-            }
             
+            # if the reference test was not responsible for killing this variant, don't grade
+            if ref.passed or ref.failure.exception != "RSpec::Expectations::ExpectationNotMetError":
+                continue
+            
+            out[testID] = { 'correct' : False }
+
+            # cases in order:
+            #   Student did not submit test case
+            #   Student test did not kill mutant correctly
+            #   Student test fails, but not due to an assertion
+            #   Student test fails by wrong assertion
+
             if sub is None: 
-                msg = "not found\n"
-            elif ref.passed != sub.passed:
-                refRes = 'pass' if ref.passed else 'fail'
-                subRes = 'pass' if sub.passed else 'fail'
-                msg = f"should {refRes} but {subRes}ed\n"
-                if ref.passed:
-                    msg += sub.failure.err_msg + '\n'
-            elif (not ref.passed) and (sub.failure.exception != ref.failure.exception):
-                # when we fail as expected but don't fail due to an assertion
-                msg = f"failed to unexpected error\n{sub.failure.err_msg}\n"
-                # continue
-            elif (not ref.passed) and (sub.failure.err_msg.split('\n')[0] != ref.failure.err_msg.split('\n')[0]):
-                # when we *do* fail by an assertion, but the assertion is wrong
-                msg = f"failed by wrong assertion\n"
-                # continue
+                msg = "Not found\n"
+
+            elif sub.passed:
+                msg = f"Should fail but passed\n"
+
+            elif sub.failure.exception != ref.failure.exception:
+                msg = f"Failed to unexpected error\n{sub.failure.err_msg}\n"
+
+            elif sub.failure.err_msg.split('\n')[0] != ref.failure.err_msg.split('\n')[0]:
+                msg = f"Failed by wrong assertion\n"
+
             else:
-                msg = f"{'pass' if ref.passed else 'fail'}ed as intended\n"
+                msg = f"Failed as intended\n"
                 out[testID]['correct'] = True
-            out[testID].update({
-                "message" : msg,
-                "supposed to pass" : ref.passed
-            })
+
+            out[testID].update({ "message" : msg })
 
         return out

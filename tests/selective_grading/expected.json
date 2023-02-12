@@ -1,18 +1,17 @@
 {
-    "gradable":true,
-    "tests":[
-       {
-          "name":"GiftCard fails with negative balance",
-          "output":"Var 1 : not found\nVar 2 : not found\nVar 3 : not found\n",
-          "points":0,
-          "max_points":3
-       },
-       {
-          "name":"GiftCard succeeds with positive balance",
-          "output":"Var 2 : failed to unexpected error\nundefined method `to' for -20:Integer\nVar 3 : should pass but failed\nundefined method `to' for 20:Integer\n",
-          "points":0,
-          "max_points":2
-       }
-    ],
-    "score":0.0
+   "gradable": true, 
+   "tests": [
+      { 
+         "name": "GiftCard fails with negative balance", 
+         "output": "Var 1 : Not found\n", 
+         "points": 0, 
+         "max_points": 1
+      }, {
+         "name": "GiftCard succeeds with positive balance", 
+         "output": "Var 2 : Failed to unexpected error\nundefined method `to' for -20:Integer\n", 
+         "points": 0, 
+         "max_points": 1
+      }
+   ], 
+   "score": 0.0
 }

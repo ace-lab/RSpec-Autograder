@@ -16,5 +16,5 @@ def halve(n)
 end
 
 def even?(n)
-    !(inc(n) % 2 == 0)
+    !(n % 2 == 0)
 end
