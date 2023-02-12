@@ -84,7 +84,7 @@ run_test() {
     # run the test 
     grade $1
     # stop if failed
-    if [[ $? == "1" ]]; then return; fi
+    if [[ $? == "1" ]]; then return 1; fi
 
     # compare the result
     echo ========================= COMPARISON =========================
@@ -94,7 +94,25 @@ run_test() {
     echo
     echo ======================= END COMPARISON =======================
 
-    return
+    return 0
+}
+
+run_tests() {
+    tests=`ls -d tests/*/`
+
+    failures=0
+    failed=""
+
+    while IFS= read -r line; do
+        run_test $line
+        if [[ $? == 1 ]]; then 
+            failures=$((failures+1)); 
+            failed="$failed\n$line"
+        fi
+
+    done  <<< "$tests"
+
+    echo "Failures: $failures $failed"
 }
 
 new_test() {
