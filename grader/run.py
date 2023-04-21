@@ -7,7 +7,7 @@ from json import dumps as json_dumps
 from json import loads as json_loads
 from typing import Dict, Tuple
 from suite import Var
-from parse import parseOutput, verifyOutput, GRADING_SCRIPT, ENTRY_FILE
+from parse import parseOutput, verifyOutput, GRADING_SCRIPT, PRE_SCRIPT, ENTRY_FILE
 
 ROOT_DIR: str = '/grade' if len(argv) < 2 else argv[1]
 
@@ -20,6 +20,7 @@ VAR_REGEX: str = '^var_.+$'
 WORK_DIR: str = f"{ROOT_DIR}/working"
 
 # this can be defined properly in `parse.py`
+PRE_SCRIPT    : str = PRE_SCRIPT    .format(work=WORK_DIR, file=f"{WORK_DIR}/{ENTRY_FILE}")
 GRADING_SCRIPT: str = GRADING_SCRIPT.format(work=WORK_DIR, file=f"{WORK_DIR}/{ENTRY_FILE}")
 
 if not os.path.exists(f"{ROOT_DIR}"):
@@ -29,8 +30,29 @@ with open(f"{VARS_DIR}/meta.json", 'r') as info:
     grading_info = json_loads(info.read())
 with open(f"{ROOT_DIR}/data/data.json", 'r') as data:
     content = data.read()
-    # print(content)
+    # print("Ingested submission data:")
+    # pprint(content)
     submission_data = json_loads(content)
+
+def prepSubmission():
+    try:
+        import importlib.machinery
+        loader = importlib.machinery.SourceFileLoader('submission_processing', '/grade/tests/submission_processing.py')
+        module = loader.load_module()
+        module.prepSubmission(submission_data, ROOT_DIR, SUBMISSION_DIR)
+    except:
+        # there may not be files in student/, so we just hide the error
+        # TODO: check if files exist before doing this
+        os.system(f"cp {ROOT_DIR}/student/* {SUBMISSION_DIR} 2> /dev/null")
+        
+        # copy student submission from /grade/data/data.json 
+        #   into the end of f"{SUBMISSION_DIR}/_submission_file"
+        #   and add the pre- and post- text
+        with open(f"{SUBMISSION_DIR}/_submission_file", 'w') as sub: 
+            sub.write( grading_info.get('pre-text', '') )
+            sub.write( submission_data['submitted_answers']['student-parsons-solution'] )
+            sub.write( grading_info.get('post-text', '') )
+    
 
 def lsVars(dir: str = VARS_DIR):
     """get the folder names that match VAR_REGEX"""
@@ -65,17 +87,27 @@ def load_var(var_name: str, solution: bool) -> Var:
 def runVar(var_name: str, solution: bool) -> Tuple[Var, str]:
     """Prepares, runs, and parses the execution of a variant from its name (its folder)"""
     load_var(var_name=var_name, solution=solution)
-    output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
-    if not verifyOutput(output):
-        suite = "instructor" if solution else "student"
-        print(f"Error when running variant {var_name} on {suite} suite. Output:")
-        print(f"> {output}")
-        exit(1)
-    # print(f"OUT: {output}")
+
     vname = var_name[len("var_"):] # cut out the "var_" at the front
     vname = vname.capitalize() # fix capitalization ("hello_There" -> "Hello_there")
     vname = vname.replace("_", " ")
-    return parseOutput(output=output, name=vname), output
+
+    os.popen(f"cd {WORK_DIR} && {PRE_SCRIPT}")
+    output = os.popen(f"cd {WORK_DIR} && {GRADING_SCRIPT}").read()
+    verification = verifyOutput(output)
+
+    def panic(varName: str, stdout: str) -> None:
+        suite = "instructor" if solution else "student"
+        print(f"Error when running variant \"{varName}\" on {suite} suite. Output:")
+        print(f"> {stdout}")
+        exit(1)
+    
+    # if not solution:
+    #     print(f"Contents of {WORK_DIR}/spec/giftcard_spec.rb")
+    #     with open(f"{WORK_DIR}/spec/giftcard_spec.rb", "r") as f:
+    #         print(f.read())
+
+    return parseOutput(output=output, name=vname, result=verification, exit_func=panic), output
 
 if __name__ == '__main__':
     
@@ -90,18 +122,8 @@ if __name__ == '__main__':
 
     if not os.path.exists(SUBMISSION_DIR):
         os.mkdir(SUBMISSION_DIR)
-    # there may not be files in student/, so we just hide the error
-    # TODO: check if files exist before doing this
-    os.system(f"cp {ROOT_DIR}/student/* {SUBMISSION_DIR} 2> /dev/null")
-    
-    # copy student submission from /grade/data/data.json 
-    #   into the end of f"{SUBMISSION_DIR}/_submission_file"
-    #   and add the pre- and post- text
-    with open(f"{SUBMISSION_DIR}/_submission_file", 'w') as sub: 
-        sub.write( grading_info.get('pre-text', '') )
-        sub.write( submission_data['submitted_answers']['student-parsons-solution'] )
-        sub.write( grading_info.get('post-text', '') )
 
+    prepSubmission()
     
     vars = lsVars()
     emptyTest = { 'message': '', 'points': 0, 'max_points': 0 }
@@ -113,9 +135,9 @@ if __name__ == '__main__':
 
         report = Var.grade(ref_var, sub_var)
 
-        for testID, data in report.items(): # TODO: make sure that no unexpected derefs are done
+        for testID, data in report.items(): 
             out[testID] = {
-                'message' : out.get(testID, emptyTest)['message'] + f"{ref_var.id} : {data['message']}",
+                'message' : out.get(testID, emptyTest)['message'] + f"Variant \"{ref_var.id}\" : {data['message']}",
                 'points' : out.get(testID, emptyTest)['points'] + int(data['correct']),
                 'max_points' : out.get(testID, emptyTest)['max_points'] + 1
             }
@@ -138,5 +160,6 @@ if __name__ == '__main__':
         os.mkdir(out_path)
     with open(f'{ROOT_DIR}/results/results.json', 'w+') as results:
         json_data: str = json_dumps(gradingData)
-        pprint(gradingData)
+        # print("Returned grading data:")
+        # pprint(gradingData)
         results.write(json_data)

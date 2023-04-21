@@ -1,5 +1,6 @@
 build() { sudo docker build -t nalsoon/rspec-autograder . ; }
 push() { sudo docker push nalsoon/rspec-autograder:latest ; }
+buildPushDev() { sudo docker build -t nalsoon/rspec-autograder:dev . && sudo docker push nalsoon/rspec-autograder:dev ; }
 buildPush() { build && push ; }
 
 grade() {
@@ -91,10 +92,11 @@ run_test() {
     echo
     output_loc="`pwd`/.container_mount/grade/results/results.json"
     python3 $script_dir/tests/verify_out.py $1/expected.json $output_loc
+    exit_code=$?
     echo
     echo ======================= END COMPARISON =======================
 
-    return 0
+    return $exit_code
 }
 
 run_tests() {
@@ -112,7 +114,8 @@ run_tests() {
 
     done  <<< "$tests"
 
-    echo "Failures: $failures $failed"
+    echo -e "Failures: $failures $failed"
+    return [[ $failures == "0" ]]
 }
 
 new_test() {

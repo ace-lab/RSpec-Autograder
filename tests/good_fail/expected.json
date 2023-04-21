@@ -3,12 +3,12 @@
    "tests": [
       {
          "name": "GiftCard fails with negative balance", 
-         "output": "Var 1 : Failed as intended\n", 
+         "output": "Variant \"Var 1\" : Failed as intended\n", 
          "points": 1, 
          "max_points": 1
       }, {
          "name": "GiftCard succeeds with positive balance", 
-         "output": "Var 2 : Not found\n", 
+         "output": "Variant \"Var 2\" : Not found\n", 
          "points": 0, 
          "max_points": 1
       }

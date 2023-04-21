@@ -3,7 +3,7 @@
     "tests": [
         {
             "name": "even? should return true on even numbers", 
-            "output": "Case one : Should fail but passed\nCase two : Should fail but passed\n", 
+            "output": "Variant \"Case one\" : Should fail but passed\nVariant \"Case two\" : Should fail but passed\n", 
             "points": 0, 
             "max_points": 2
         }

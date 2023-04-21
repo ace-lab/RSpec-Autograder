@@ -38,5 +38,7 @@ else:
     print(f"{len(unexpected)} unexpected tests found")
     print(f"{len(different)} differing grades found")
     print("Run with python -i to inspect `expected`, `unexpected`, and `different`")
+    if (len(unexpected) + len(different)) > 0:
+        exit(1)
 
 

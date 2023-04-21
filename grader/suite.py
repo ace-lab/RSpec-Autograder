@@ -32,14 +32,17 @@ class Test(object):
         return base #+ ("pass" if self.passed else f"{self.failure}")
 
 class Var(object):
-    def __init__(self, tests: Dict[str, Test], id: str) -> None:
+    def __init__(self, tests: Dict[str, Test], id: str, feedback_banner: str = "") -> None:
         self.tests = tests
         self.id = id
+        self.feedback_banner = f"\n{feedback_banner}\n"
 
     def __repr__(self) -> str:
-        return f"Var({self.id},\n\t" + \
-            '\n\t'.join([f"{test}" for test in self.tests]) + \
-            '\n)'
+        # if len(self.tests) > 0:
+        info_str = '\n\t' +'\n\t'.join([f"{test}" for test in self.tests])
+        # else:
+            # info_str = ' "Failed to Unexpected Error"'
+        return f"Var({self.id},{info_str}\n)"
 
     def grade(self, reference) -> Dict:
         return Var.grade(self, reference)
@@ -66,7 +69,7 @@ class Var(object):
             #   Student test fails by wrong assertion
 
             if sub is None: 
-                msg = "Not found\n"
+                msg = ("Not found\n" + submission.feedback_banner).strip() + "\n"
 
             elif sub.passed:
                 msg = f"Should fail but passed\n"
