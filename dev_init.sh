@@ -3,12 +3,34 @@ push() { sudo docker push nalsoon/rspec-autograder:latest ; }
 buildPushDev() { sudo docker build -t nalsoon/rspec-autograder:dev . && sudo docker push nalsoon/rspec-autograder:dev ; }
 buildPush() { build && push ; }
 
-grade() {
-    # assuming $1 is the variants_dir (the question/tests/ directory)
+buildCont() { # build rspec-autograder:dev
+    # only report errors
+    hash="$(sudo docker build -q -t rspec-autograder:dev .  | cut -d: -f2)"
+    echo \> Image name/hash: rspec-autograder:dev / $hash
+}
+
+runImage() { # run rspec-autograder:dev
+    cont="$(sudo docker run --network none --mount type=bind,source=`pwd`/.container_mount/grade,target=/grade -d rspec-autograder:dev /grader/run.py)"
+    echo \> Container hash: $cont
+    code="$(sudo docker container wait $cont)"
+    echo \> Container exited with code $code
+    return $code
+}
+
+clean_up() { # assuming $1 is the container hash
+    sudo chown -R $USER .container_mount/grade/
+    # destroy the container
+    echo -n Deleting continer ...
+    sudo docker container rm $1 > /dev/null
+    echo done.
+}
+
+prep_mount() { # assuming $1 is the variants_dir (the question/tests/ directory)
 
     which jq > /dev/null
     if [[ $? != "0" ]]; then 
         echo "jq is required to run this script, please install and add it to your \$PATH"
+        return 1
     fi
 
     echo "Preparing mount files ... "
@@ -53,45 +75,14 @@ grade() {
     bundle package --all --without-production --all-platforms
     bundle install --development
     cd $pd
-
-    echo done.
-
-    echo Running the grader
-    # only report errors
-    im="$(sudo docker build -q -t rspec-autograder:dev .  | cut -d: -f2)"
-    echo \> Image name/hash: rspec-autograder:dev / $im
-    cont="$(sudo docker run --network none --mount type=bind,source=`pwd`/.container_mount/grade,target=/grade -d $im /grader/run.py)"
-    echo \> Container hash: $cont
-    code="$(sudo docker container wait $cont)"
-    echo \> Container exited with code $code
-
-    if [[ $code == 0 ]]; then
-        sudo chown -R $USER .container_mount/grade/
-        # destroy the container
-        echo -n Deleting continer ...
-        sudo docker container rm $cont > /dev/null
-        echo done.
-    fi
-
-    return $code
 }
 
-run_test() {
-    # $1 is variant_dir
-
-    # basically remove "run_test.sh" from the script call to get the directory
-    script_dir=`pwd`
-
-    # run the test 
-    grade $1
-    # stop if failed
-    if [[ $? == "1" ]]; then return 1; fi
-
+compare() { # assuming $1 is the variant directory, $2 is the script directory
     # compare the result
     echo ========================= COMPARISON =========================
     echo
     output_loc="`pwd`/.container_mount/grade/results/results.json"
-    python3 $script_dir/tests/verify_out.py $1/expected.json $output_loc
+    python3 $2/tests/verify_out.py $1/expected.json $output_loc
     exit_code=$?
     echo
     echo ======================= END COMPARISON =======================
@@ -99,23 +90,58 @@ run_test() {
     return $exit_code
 }
 
+run_test() { # $1 is variant_dir (the question/tests/ directory)
+
+    # basically remove "run_test.sh" from the script call to get the directory
+    script_dir=`pwd`
+
+    prep_mount $1
+    if [[ $? != "0" ]]; then return 1; fi
+    echo done.
+
+    echo Running the grader
+    buildCont
+    runImage
+
+    if [[ $? == 0 ]]; then
+        clean_up $cont
+    else return 1; fi
+
+    compare $1 $script_dir
+
+    return $?
+}
+
 run_tests() {
     tests=`ls -d tests/*/`
+    script_dir=`pwd`
 
     failures=0
     failed=""
 
-    while IFS= read -r line; do
-        run_test $line
-        if [[ $? == 1 ]]; then 
+    buildCont
+
+    while IFS= read -r variant_dir; do
+        
+        prep_mount $variant_dir
+        if [[ $? != "0" ]]; then return 1; fi
+
+        runImage
+        if [[ $? != "0" ]]; then 
             failures=$((failures+1)); 
             failed="$failed\n$line"
+        else
+            compare $variant_dir $script_dir
+            if [[ $? != "0" ]]; then 
+                failures=$((failures+1)); 
+                failed="$failed\n$line"
+            fi
         fi
 
     done  <<< "$tests"
 
     echo -e "Failures: $failures $failed"
-    return [[ $failures == "0" ]]
+    return $((1 - ($failures == 0)))
 }
 
 new_test() {
