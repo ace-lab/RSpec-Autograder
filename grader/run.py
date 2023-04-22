@@ -152,9 +152,13 @@ if __name__ == '__main__':
         for testID, data in out.items()
     ]
 
-    pts = sum([ test['points'] for test in gradingData['tests'] ])
-    max_pts = sum([ test['max_points'] for test in gradingData['tests'] ])
-    gradingData['score'] = pts / max_pts
+    if len(gradingData['tests']) > 0:
+        pts = sum([ test['points'] for test in gradingData['tests'] ])
+        max_pts = sum([ test['max_points'] for test in gradingData['tests'] ])
+        gradingData['score'] = pts / max_pts
+    else:
+        print(f"No gradable test-mutant pairs found!")
+        gradingData['score'] = 0
 
     if not os.path.exists(out_path := f"{ROOT_DIR}/results"):
         os.mkdir(out_path)
