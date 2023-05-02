@@ -1,6 +1,6 @@
-build() { sudo docker build -t nalsoon/rspec-autograder . ; }
-push() { sudo docker push nalsoon/rspec-autograder:latest ; }
-buildPushDev() { sudo docker build -t nalsoon/rspec-autograder:dev . && sudo docker push nalsoon/rspec-autograder:dev ; }
+build() { sudo docker build -t saasbook/pl-rspec-autograder . ; }
+push() { sudo docker push saasbook/pl-rspec-autograder:latest ; }
+buildPushDev() { sudo docker build -t saasbook/pl-rspec-autograder:dev . && sudo docker push saasbook/pl-rspec-autograder:dev ; }
 buildPush() { build && push ; }
 
 buildCont() { # build rspec-autograder:dev

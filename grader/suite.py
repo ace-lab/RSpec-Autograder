@@ -1,5 +1,10 @@
 from typing import Dict, List
 
+VALID_EXPECTATION_ERRORS = (
+    "RSpec::Expectations::ExpectationNotMetError",
+    "RSpec::Mocks::MockExpectationError",
+)
+
 class Failure(object):
     def __init__(self, exception: str, err_msg: str, backtrace: List[str]) -> None:
         self.exception = exception
@@ -57,7 +62,7 @@ class Var(object):
             sub: Test = submission.tests.get(testID)
             
             # if the reference test was not responsible for killing this variant, don't grade
-            if ref.passed or ref.failure.exception != "RSpec::Expectations::ExpectationNotMetError":
+            if ref.passed or ref.failure.exception not in VALID_EXPECTATION_ERRORS:
                 continue
             
             out[testID] = { 'correct' : False }
