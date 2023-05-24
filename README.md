@@ -7,7 +7,7 @@ To use, add the following to  `info.json`  in your question
 "gradingMethod": "External",
 "externalGradingOptions": {
         "enabled": true,
-        "image" : "nasloon/rspec-autograder",
+        "image" : "saasbook/pl-rspec-autograder",
         "entrypoint": "/grader/run.py",
         "timeout" : 60
     }
