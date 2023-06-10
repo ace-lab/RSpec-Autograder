@@ -49,10 +49,9 @@ prep_mount() { # assuming $1 is the variants_dir (the question/tests/ directory)
     # load the variants
     # script_dir="$(pwd)/${0::-18}"
     variant_dir="$(pwd)/$1/"
-    cp -r $variant_dir/common .container_mount/grade/tests/
-    cp -r $variant_dir/var_* .container_mount/grade/tests/
-    cp -r $variant_dir/solution .container_mount/grade/tests/
-    cp $variant_dir/meta.json .container_mount/grade/tests/
+    cp -r $variant_dir/* .container_mount/grade/tests/
+    rm .container_mount/grade/tests/data.json
+    rm .container_mount/grade/tests/expected.json
 
     # load submission files
     if [[ -f $variant_dir/data.json ]]; then
