@@ -71,8 +71,8 @@ prep_mount() { # assuming $1 is the variants_dir (the question/tests/ directory)
     # now that the files are in place, install the packages
     pd=`pwd`
     cd $variant_dir/common
-    bundle package --all --without-production --all-platforms
-    bundle install --development
+    bundle package --all-platforms --quiet > /dev/null #--without-production
+    bundle install --local > /dev/null #--development
     cd $pd
 }
 
@@ -122,6 +122,8 @@ run_tests() {
 
     while IFS= read -r variant_dir; do
         
+        echo Running test \"$variant_dir\"
+
         prep_mount $variant_dir
         if [[ $? != "0" ]]; then return 1; fi
 
