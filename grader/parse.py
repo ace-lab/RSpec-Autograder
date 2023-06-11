@@ -8,8 +8,8 @@ from enum import Enum
 # PRE_SCRIPT and GRADING_SCRIPT
 # Both commands are 
 PRE_SCRIPT = "&&".join([
-    # 'bundle config path /grader/vendor/bundle',
-    'bundle install --local --without production --quiet',
+    'bundle _2.3.26_ config set --local without \'production\'',
+    'bundle _2.3.26_ install --local --quiet',
 ])
 GRADING_SCRIPT = "&&".join([
     'rspec --format json' 

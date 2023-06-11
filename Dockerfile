@@ -9,6 +9,7 @@ RUN apk add --no-cache ruby ruby-bundler build-base
 
 RUN gem install json rspec rake
 RUN gem update --system 2.7.10
+RUN gem install bundler -v 2.3.26
 
 RUN mkdir /grader
 COPY grader /grader

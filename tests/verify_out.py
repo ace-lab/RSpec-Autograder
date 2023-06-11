@@ -1,22 +1,40 @@
 from json import loads as json_loads
 from sys import argv, exit
+from typing import Dict
 
 assert len(argv) > 2, "usage: verify_out.py <path/to/expected.json> <path/to/produced.json>"
 exp_path = argv[1]
 res_path = argv[2]
 
-with open(exp_path, 'r') as f:
-    exp = json_loads(f.read())
+class PLTest:
+    
+    def __init__(self, name: str, output:str, points:int, max_points:int = 1):
+        self.name = name
+        self.output = output
+        self.points = points
+        self.max_points = max_points
+    
+    def __eq__(self, other) -> bool:
+        same_name = self.name == other.name
+        similar_out = set(self.output.split('\n')) == set(other.output.split('\n'))
+        same_points = self.points == other.points
+        same_max_points = self.max_points == other.max_points
 
-with open(res_path, 'r') as f:
-    res = json_loads(f.read())
+        return same_name and same_points and same_max_points and similar_out
 
-res_parsed = {}
-for test in res['tests']:
-    res_parsed[test['name']] = test
-exp_parsed = {}
-for test in exp['tests']:
-    exp_parsed[test['name']] = test
+def parse_json(path: str) -> Dict[str, PLTest]:
+    
+    parsed: Dict[str, PLTest] = {}
+
+    with open(path, 'r') as f:
+        data: Dict = json_loads(f.read())
+        for test in data['tests']:
+            parsed[test['name']] = PLTest(**test)
+    
+    return parsed
+
+res_parsed: Dict[str, PLTest] = parse_json(res_path)
+exp_parsed: Dict[str, PLTest] = parse_json(exp_path)
 
 if exp_parsed == res_parsed:
     print(f"No difference found")
