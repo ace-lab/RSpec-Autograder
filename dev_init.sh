@@ -85,6 +85,7 @@ compare() { # assuming $1 is the variant directory, $2 is the script directory
     exit_code=$?
     echo
     echo ======================= END COMPARISON =======================
+    echo 
 
     return $exit_code
 }
