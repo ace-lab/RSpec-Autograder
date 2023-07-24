@@ -3,6 +3,7 @@ from suite import Var, Test, Failure
 from json import loads as json_loads
 from json.decoder import JSONDecodeError
 from enum import Enum
+from re import sub as str_replace
 
 # can use {work} for the working dir and {file} for ENTRY_FILE absolute path for both
 # PRE_SCRIPT and GRADING_SCRIPT
@@ -50,10 +51,11 @@ def parseOutput(output: str, name: str, result: Result, exit_func: Callable[[str
             failure = None
         else:
             ex = rspec_test['exception']
-
+            # import code
+            # code.interact(local=locals())
             failure = Failure(
                 exception=ex['class'], 
-                err_msg=ex['message'], 
+                err_msg=str_replace("0x[0-9a-f]+", "0x0000", ex['message']), 
                 backtrace=ex['backtrace']
             )
 
