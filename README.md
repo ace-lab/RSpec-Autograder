@@ -1,4 +1,6 @@
-# RSpec-Autograder
+# [___ARCHIVED___](https://github.com/ace-lab/pl-ruby-rspec-autograders): RSpec-Autograder
+
+___This autograder has been moved to [another repository! (https://github.com/ace-lab/pl-ruby-rspec-autograders)](https://github.com/ace-lab/pl-ruby-rspec-autograders)___
 
 Please see the [wiki](https://github.com/ace-lab/RSpec-Autograder/wiki) for details on [usage](), the [grading algorithm](), and more.
 
